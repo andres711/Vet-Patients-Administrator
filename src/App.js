@@ -1,24 +1,53 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { Fragment, useState, useEffect } from "react";
+import Form from "./Components/Form";
+import Date from "./Components/Date";
+
 
 function App() {
+
+  let initialDates = JSON.parse(localStorage.getItem("dates"))
+  
+  if(!initialDates){
+    initialDates=[]
+  }
+
+  const [dates, setDates] = useState(initialDates);
+
+  useEffect(()=>{
+    if(dates){
+      localStorage.setItem("dates",JSON.stringify(dates))
+    } 
+    else{
+      localStorage.setItem("dates",JSON.stringify([]))
+    } 
+  },[dates])
+
+  const createDate = (newDate) => {
+    setDates([...dates, newDate]);
+  };
+  const deleteDate = id =>{
+    const filter = dates.filter(date => date.id !== id)
+    setDates(filter)
+  }
+  const titulo = dates.length>0 ?<h2>Administrate your dates</h2> :<h2>Add new date</h2>
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Fragment>
+      <h1>Patients administrator</h1>
+      <div className="container">
+        <div className="row">
+          <div className="six columns">
+            <Form createDate={createDate} />
+          </div>
+          <div className="six columns">
+            {titulo}
+            {dates.map((date) =>(
+              <Date key={date.id} date={date} deleteDate={deleteDate} />
+            ))}
+          </div>
+        </div>
+      </div>
+    </Fragment>
   );
 }
 
